@@ -1,0 +1,20 @@
+BridgeKey = C_ROUTE_CONTROL_T[ROUTE_CODE] & "_" & C_ROUTE_CONTROL_T[GROUP_NAME]
+
+PB_Flag = 
+IF(R_WIP_TRACKING_T[PO_NO] = "MP", "MP", "QT")
+
+Shift = 
+VAR CurrentTime = TIME(HOUR('R_WIP_TRACKING_T'[IN_STATION_TIME]), MINUTE('R_WIP_TRACKING_T'[IN_STATION_TIME]), SECOND('R_WIP_TRACKING_T'[IN_STATION_TIME]))
+RETURN
+SWITCH(
+    TRUE(),
+    CurrentTime >= TIME(5, 0, 0) && CurrentTime < TIME(15, 0, 0), "Day shift",
+    "Swing shift"
+)
+
+
+Target SN Distinct Count = 
+CALCULATE(
+    VALUE(DISTINCTCOUNT('R_WIP_TRACKING_T'[SERIAL_NUMBER])),
+     'R_WIP_TRACKING_T'[GROUP_NAME]<> "0"
+)
