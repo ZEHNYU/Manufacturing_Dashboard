@@ -1,0 +1,23 @@
+DateTable = 
+VAR MinYear = 2024
+VAR MaxYear = 2025
+RETURN
+ADDCOLUMNS(
+    CALENDAR(
+        DATE(MinYear, 1, 1), 
+        DATE(MaxYear, 12, 31)
+    ),
+    "Year", YEAR([Date]),
+    "Quarter", "Q" & FORMAT([Date], "Q"),
+    "Month", FORMAT([Date], "mmmm"),
+    "MonthNumber", MONTH([Date]),
+    "Day", DAY([Date]),
+    "Weekday", FORMAT([Date], "dddd"),
+    "WeekdayNumber", WEEKDAY([Date], 2),
+    "YearMonth", FORMAT([Date], "yyyy-mm"),
+    "IsWeekend", IF(WEEKDAY([Date], 2) >= 6, TRUE(), FALSE())
+)
+
+
+Closed Date = IF(MP[Status] = "TECO", MP[Change date], BLANK())
+
