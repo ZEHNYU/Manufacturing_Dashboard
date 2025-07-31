@@ -1,0 +1,22 @@
+BridgeKey = R_SN_DETAIL_T[SPECIAL_ROUTE] & "_" & R_SN_DETAIL_T[GROUP_NAME]
+
+Shift = 
+VAR CurrentTime = TIME(HOUR('R_SN_DETAIL_T'[IN_STATION_TIME]), MINUTE('R_SN_DETAIL_T'[IN_STATION_TIME]), SECOND('R_SN_DETAIL_T'[IN_STATION_TIME]))
+RETURN
+SWITCH(
+    TRUE(),
+    CurrentTime >= TIME(5, 0, 0) && CurrentTime < TIME(17, 0, 0), "Day shift",
+    "Swing shift"
+)
+
+TimeDifference = 
+CALCULATE(
+    DATEDIFF(
+        MIN('R_SN_DETAIL_T'[IN_STATION_TIME]),
+        MAX('R_SN_DETAIL_T'[IN_STATION_TIME]),
+        DAY
+    ),
+    ALLEXCEPT('R_SN_DETAIL_T', 'R_SN_DETAIL_T'[PO_NO],'R_SN_DETAIL_T'[SERIAL_NUMBER])
+)
+
+Error_Status = IF('R_WIP_TRACKING_T'[ERROR_FLAG] = "0", "PASS", "ERROR")
