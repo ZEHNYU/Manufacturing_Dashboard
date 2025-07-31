@@ -1,0 +1,40 @@
+BridgeTable = 
+DISTINCT( UNION(SELECTCOLUMNS(R_SN_DETAIL_T,"BridgeKey",R_SN_DETAIL_T[BridgeKey]),SELECTCOLUMNS(C_ROUTE_CONTROL_T,"BridgeKey",C_ROUTE_CONTROL_T[BridgeKey])))
+
+BridgeKey = C_ROUTE_CONTROL_T[ROUTE_CODE] & "_" & C_ROUTE_CONTROL_T[GROUP_NAME]
+
+Duplicate_SN_Count = 
+CALCULATE (
+    COUNTROWS (
+        FILTER (
+            ADDCOLUMNS (
+                SUMMARIZE (
+                    'R_SN_DETAIL_T',
+                    'R_SN_DETAIL_T'[GROUP_NAME],
+                    'R_SN_DETAIL_T'[SERIAL_NUMBER]
+                ),
+                "SN_Count", 
+                CALCULATE ( COUNTROWS ( 'R_SN_DETAIL_T' ) )
+            ),
+            [SN_Count] > 1
+        )
+    )
+)
+
+Is_Repaired = 
+IF(
+    LEFT('R_SN_DETAIL_T'[GROUP_NAME], 2) = "R_",
+    TRUE(),
+    FALSE()
+)
+
+TimeDifference = 
+CALCULATE(
+    DATEDIFF(
+        MIN('R_SN_DETAIL_T'[IN_STATION_TIME]),
+        MAX('R_SN_DETAIL_T'[IN_STATION_TIME]),
+        DAY
+    ),
+    ALLEXCEPT('R_SN_DETAIL_T', 'R_SN_DETAIL_T'[PO_NO],'R_SN_DETAIL_T'[SERIAL_NUMBER])
+)
+
