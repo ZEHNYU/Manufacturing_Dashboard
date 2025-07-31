@@ -1,0 +1,21 @@
+Aging = DATEDIFF(TODAY(),R_MO_BASE_T[MO_CREATE_DATE],DAY)
+
+Balance = 
+CALCULATE(
+    SUM(R_MO_BASE_T[TARGET_QTY]) - CALCULATE(R_MO_BASE_T[NPT_OUT QTY]+R_MO_BASE_T[Shipping QTY]))
+
+NPT_OUT QTY = COUNTROWS(FILTER(R_WIP_TRACKING_T,R_WIP_TRACKING_T[GROUP_NAME]="NPI_OUT"))
+
+Shipping QTY = COUNTROWS(FILTER(R_WIP_TRACKING_T,R_WIP_TRACKING_T[GROUP_NAME]="Shipping"))
+
+WIP Range = 
+VAR Aging=R_MO_BASE_T[Aging]
+RETURN
+SWITCH(TRUE(),
+        ISBLANK(R_MO_BASE_T[Aging]),BLANK(),
+        Aging > 0, BLANK(),
+        Aging < -120, ">120",
+        Aging < -90, ">90",
+        Aging < -60, ">60",
+        Aging < -30, ">30",
+        Aging >= -30, "This Month")
