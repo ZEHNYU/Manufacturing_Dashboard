@@ -1,0 +1,39 @@
+CTB_NormalizedColor = 
+VAR RawColor = UPPER(TRIM('ShortageInfo'[ColorCode]))
+RETURN
+SWITCH(
+    TRUE(),
+    RawColor = "G", "G",
+    RawColor = "CONSIGN", "G",
+    RawColor = "Y", "Y",
+    RawColor = "R", "R",
+    TRUE, "R"
+)
+
+CTB_HasYellowMaterial = 
+IF(
+    [CTB_HasRedMaterial] = 0,
+    CALCULATE(
+        COUNTROWS('ShortageInfo'),
+        'ShortageInfo'[CTB_NormalizedColor] = "Y"
+    ),
+    0
+)
+
+CTB_HasRedMaterial = 
+CALCULATE(
+    COUNTROWS('ShortageInfo'),
+    'ShortageInfo'[CTB_NormalizedColor] = "R"
+)
+
+CTB Date = 
+IF(
+    [CTB_HasRedMaterial] > 0,
+    "can't match RSD",
+    IF(
+        [CTB_HasYellowMaterial] > 0,
+        FORMAT(SELECTEDVALUE('PBR Build Information'[Requested Start Date]), "mm/dd/yyyy"),
+        FORMAT(TODAY(), "mm/dd/yyyy")
+    )
+)
+
